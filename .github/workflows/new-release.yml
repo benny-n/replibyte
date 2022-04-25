@@ -28,6 +28,7 @@ jobs:
       - name: Prepare release
         run: |
           cd target/x86_64-unknown-linux-musl/release
+          sudo chmod 777 replibyte
           strip replibyte
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
@@ -44,8 +45,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-win:
-    runs-on: windows-latest
+  build-windows:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -60,12 +61,15 @@ jobs:
           override: true
 
       - name: Build for windows
-        run: cargo build --all --release --target x86_64-pc-windows-gnu
+        run: |
+        sudo apt update && apt upgrade -y
+        sudo apt install -y g++-mingw-w64-x86-64
+        cargo build --all --release --target x86_64-pc-windows-gnu
 
       - name: Prepare release
-        shell: bash
         run: |
           cd target/x86_64-pc-windows-gnu/release
+          sudo chmod 777 replibyte.exe
           strip replibyte.exe
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
@@ -103,9 +107,11 @@ jobs:
             --workdir /root/src \
             joseluisq/rust-linux-darwin-builder:1.60.0 \
             sh -c "CC=o64-clang CXX=o64-clang++ cargo build --release --target x86_64-apple-darwin"
-          ls -la
-          pwd
+
+      - name: Prepare release
+        run: |
           cd target/x86_64-apple-darwin/release
+          sudo chmod 777 replibyte
           strip replibyte
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
@@ -113,17 +119,6 @@ jobs:
           mv replibyte $FILE
           zip -9r ${FILE}.zip $FILE && rm $FILE
           sha256sum "${FILE}.zip" | cut -d ' ' -f 1 > ${FILE}.sha256sum
-
-      # - name: Prepare release
-      #   run: |
-      #     cd target/x86_64-apple-darwin/release
-      #     strip replibyte
-      #     EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
-      #     RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
-      #     FILE=replibyte_${RELEASE_NAME}_x86_64-apple-darwin
-      #     mv replibyte $FILE
-      #     zip -9r ${FILE}.zip $FILE && rm $FILE
-      #     sha256sum "${FILE}.zip" | cut -d ' ' -f 1 > ${FILE}.sha256sum
 
       - name: Release
         uses: softprops/action-gh-release@v1
