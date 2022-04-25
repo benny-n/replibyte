@@ -79,11 +79,11 @@ jobs:
 
       - name: Build for mac
         run: |
-        docker run --rm \
-          --volume "${PWD}":/root/src \
-          --workdir /root/src \
-          joseluisq/rust-linux-darwin-builder:1.60.0 \
-          sh -c "cargo build --release --target x86_64-apple-darwin"
+          docker run --rm \
+            --volume "${PWD}":/root/src \
+            --workdir /root/src \
+            joseluisq/rust-linux-darwin-builder:1.60.0 \
+            sh -c "cargo build --release --target x86_64-apple-darwin"
 
       - name: Prepare release for mac
         run: |
