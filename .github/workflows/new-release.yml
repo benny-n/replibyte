@@ -3,40 +3,46 @@ name: Release
 on: push
 
 jobs:
-  # build-linux:
-  #   runs-on: ubuntu-latest
+  build-linux:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
 
-  #     - name: Install latest rust toolchain
-  #       uses: actions-rs/toolchain@v1
-  #       with:
-  #         toolchain: stable
-  #         target: x86_64-unknown-linux-musl
-  #         default: true
-  #         override: true
+      - name: Install latest rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+          override: true
 
-  #     - name: Build
-  #       run: |
-  #         cargo build --all --release --target x86_64-unknown-linux-musl
-  #         cd target/x86_64-unknown-linux-musl/release
-  #         strip replibyte
-  #         EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
-  #         RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
-  #         FILE=replibyte_${RELEASE_NAME}_x86_64-unknown-linux-musl
-  #         mv replibyte $FILE
-  #         tar -czvf ${FILE}.tar.gz $FILE && rm $FILE
-  #         sha256sum "${FILE}.tar.gz" | cut -d ' ' -f 1 > ${FILE}.sha256sum
+      - name: Build for linux
+        run: |
+          docker run --rm \
+            --volume "${PWD}":/root/src \
+            --workdir /root/src \
+            joseluisq/rust-linux-darwin-builder:1.60.0 \
+            sh -c "cargo build --release"
 
-  #     - name: Release
-  #       uses: softprops/action-gh-release@v1
-  #       with:
-  #         files: |
-  #           target/release/replibyte_*
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Prepare release
+        run: |
+          cd target/x86_64-unknown-linux-musl/release
+          strip replibyte
+          EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
+          RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
+          FILE=replibyte_${RELEASE_NAME}_x86_64-unknown-linux-musl
+          mv replibyte $FILE
+          tar -czvf ${FILE}.tar.gz $FILE && rm $FILE
+          sha256sum "${FILE}.tar.gz" | cut -d ' ' -f 1 > ${FILE}.sha256sum
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            target/release/replibyte_*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-win:
     runs-on: windows-latest
@@ -57,15 +63,16 @@ jobs:
         run: cargo build --all --release --target x86_64-pc-windows-gnu
 
       - name: Prepare release
+        shell: bash
         run: |
           cd target/x86_64-pc-windows-gnu/release
-          strip replibyte
+          strip replibyte.exe
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
-          FILE=replibyte_${RELEASE_NAME}_x86_64-pc-windows-gnu
-          mv replibyte $FILE
-          tar -czvf ${FILE}.tar.gz $FILE && rm $FILE
-          sha256sum "${FILE}.tar.gz" | cut -d ' ' -f 1 > ${FILE}.sha256sum
+          FILE=replibyte_${RELEASE_NAME}_x86_64-pc-windows-gnu.exe
+          mv replibyte.exe $FILE
+          zip -9r ${FILE}.zip $FILE && rm $FILE
+          sha256sum "${FILE}.zip" | cut -d ' ' -f 1 > ${FILE}.sha256sum
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -95,18 +102,28 @@ jobs:
             --volume "${PWD}":/root/src \
             --workdir /root/src \
             joseluisq/rust-linux-darwin-builder:1.60.0 \
-            sh -c "CC=o64-clang CXX=o64-clang++ cargo build --target x86_64-apple-darwin"
-
-      - name: Prepare release
-        run: |
+            sh -c "CC=o64-clang CXX=o64-clang++ cargo build --release --target x86_64-apple-darwin"
+          ls -la
+          pwd
           cd target/x86_64-apple-darwin/release
           strip replibyte
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
           FILE=replibyte_${RELEASE_NAME}_x86_64-apple-darwin
           mv replibyte $FILE
-          tar -czvf ${FILE}.tar.gz $FILE && rm $FILE
-          sha256sum "${FILE}.tar.gz" | cut -d ' ' -f 1 > ${FILE}.sha256sum
+          zip -9r ${FILE}.zip $FILE && rm $FILE
+          sha256sum "${FILE}.zip" | cut -d ' ' -f 1 > ${FILE}.sha256sum
+
+      # - name: Prepare release
+      #   run: |
+      #     cd target/x86_64-apple-darwin/release
+      #     strip replibyte
+      #     EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
+      #     RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
+      #     FILE=replibyte_${RELEASE_NAME}_x86_64-apple-darwin
+      #     mv replibyte $FILE
+      #     zip -9r ${FILE}.zip $FILE && rm $FILE
+      #     sha256sum "${FILE}.zip" | cut -d ' ' -f 1 > ${FILE}.sha256sum
 
       - name: Release
         uses: softprops/action-gh-release@v1
