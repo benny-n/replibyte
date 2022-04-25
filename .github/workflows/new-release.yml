@@ -43,7 +43,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            target/release/replibyte_*
+            target/x86_64-unknown-linux-musl/release/replibyte_*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -81,7 +81,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: target/release/replibyte.exe
+          files: target/x86_64-pc-windows-gnu/release/replibyte_*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -122,6 +122,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            target/release/replibyte_darwin
+            target/x86_64-apple-darwin/release/replibyte_*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
