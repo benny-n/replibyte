@@ -1,6 +1,10 @@
 name: Release
 
-on: push
+on:
+  release:
+    types:
+      - published
+      - created
 
 jobs:
   build-linux:
@@ -28,8 +32,6 @@ jobs:
       - name: Prepare release
         run: |
           cd target/x86_64-unknown-linux-musl/release
-          sudo chmod 777 replibyte
-          strip replibyte
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
           FILE=replibyte_${RELEASE_NAME}_x86_64-unknown-linux-musl
@@ -69,8 +71,6 @@ jobs:
       - name: Prepare release
         run: |
           cd target/x86_64-pc-windows-gnu/release
-          sudo chmod 777 replibyte.exe
-          strip replibyte.exe
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
           FILE=replibyte_${RELEASE_NAME}_x86_64-pc-windows-gnu.exe
@@ -111,8 +111,6 @@ jobs:
       - name: Prepare release
         run: |
           cd target/x86_64-apple-darwin/release
-          sudo chmod 777 replibyte
-          strip replibyte
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
           FILE=replibyte_${RELEASE_NAME}_x86_64-apple-darwin
