@@ -29,9 +29,8 @@ jobs:
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
           NAME=replibyte_${RELEASE_NAME}_x86_64-unknown-linux-musl
-          mv target/release/replibyte target/release/$NAME
-          tar -czvf target/release/${NAME}.tar.gz target/release/$NAME
-          sha256sum "${target/release/NAME}" | cut -d ' ' -f 1 > target/release/{$NAME}.sha256sum
+          tar -czvf target/release/${NAME}.tar.gz target/release/replibyte
+          sha256sum "${target/release/${NAME}.tar.gz}" | cut -d ' ' -f 1 > target/release/{$NAME}.sha256sum
 
       - name: Release
         uses: softprops/action-gh-release@v1
