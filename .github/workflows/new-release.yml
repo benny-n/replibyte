@@ -24,15 +24,15 @@ jobs:
 
       - name: Build
         run: |
-          cargo build --all --release
-          cd target/release
+          cargo build --all --release --target x86_64-unknown-linux-musl
+          cd target/x86_64-unknown-linux-musl/release
           strip replibyte
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
           FILE=replibyte_${RELEASE_NAME}_x86_64-unknown-linux-musl
           mv replibyte $FILE
           tar -czvf ${FILE}.tar.gz $FILE && rm $FILE
-          sha256sum "${FILE}.tar.gz" | cut -d ' ' -f 1 > {$FILE}.sha256sum
+          sha256sum "${FILE}.tar.gz" | cut -d ' ' -f 1 > ${FILE}.sha256sum
 
       - name: Release
         uses: softprops/action-gh-release@v1
