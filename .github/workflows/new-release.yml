@@ -35,9 +35,9 @@ jobs:
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
           FILE=replibyte_${RELEASE_NAME}_x86_64-unknown-linux-musl
-          mv replibyte $FILE
-          tar -czvf ${FILE}.tar.gz $FILE && rm $FILE
-          sha256sum "${FILE}.tar.gz" | cut -d ' ' -f 1 > ${FILE}.sha256sum
+          sudo mv replibyte $FILE
+          sudo tar -czvf ${FILE}.tar.gz $FILE && rm $FILE
+          sudo sha256sum "${FILE}.tar.gz" | cut -d ' ' -f 1 > ${FILE}.sha256sum
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -74,9 +74,9 @@ jobs:
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
           FILE=replibyte_${RELEASE_NAME}_x86_64-pc-windows-gnu.exe
-          mv replibyte.exe $FILE
-          zip -9r ${FILE}.zip $FILE && rm $FILE
-          sha256sum "${FILE}.zip" | cut -d ' ' -f 1 > ${FILE}.sha256sum
+          sudo mv replibyte.exe $FILE
+          sudo zip -9r ${FILE}.zip $FILE && rm $FILE
+          sudo sha256sum "${FILE}.zip" | cut -d ' ' -f 1 > ${FILE}.sha256sum
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -114,9 +114,9 @@ jobs:
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
           FILE=replibyte_${RELEASE_NAME}_x86_64-apple-darwin
-          mv replibyte $FILE
-          zip -9r ${FILE}.zip $FILE && rm $FILE
-          sha256sum "${FILE}.zip" | cut -d ' ' -f 1 > ${FILE}.sha256sum
+          sudo mv replibyte $FILE
+          sudo zip -9r ${FILE}.zip $FILE && rm $FILE
+          sudo sha256sum "${FILE}.zip" | cut -d ' ' -f 1 > ${FILE}.sha256sum
 
       - name: Release
         uses: softprops/action-gh-release@v1
