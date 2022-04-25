@@ -26,7 +26,8 @@ jobs:
         run: |
           cargo build --all --release
           strip target/release/replibyte
-          RELEASE_NAME=$(echo "$GITHUB_EVENT_PATH" | jq -r .release.tag_name)
+          EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
+          RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
           NAME=replibyte_${RELEASE_NAME}_x86_64-unknown-linux-musl
           mv target/release/replibyte /target/release/$NAME
           tar -czvf ${NAME}.tar.gz $NAME
