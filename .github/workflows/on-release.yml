@@ -127,7 +127,7 @@ jobs:
 
   publish-on-homebrew:
     runs-on: ubuntu-latest
-    needs: [build-mac]
+    needs: build-mac
     steps:
       - name: Extract version
         id: extract-version
