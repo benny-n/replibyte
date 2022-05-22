@@ -142,8 +142,8 @@ jobs:
         if: "!contains(github.ref, '-')" # skip prereleases
         with:
           formula-name: replibyte
-          homebrew-tap: Qovery/homebrew-replibyte
-          download-url: https://github.com/Qovery/replibyte/releases/download/${{ steps.extract-version.outputs.tag-name }}/replibyte_${{ steps.extract-version.outputs.tag-name }}_x86_64-apple-darwin.zip
+          homebrew-tap: benny-n/homebrew-replibyte
+          download-url: https://github.com/benny-n/replibyte/releases/download/${{ steps.extract-version.outputs.tag-name }}/replibyte_${{ steps.extract-version.outputs.tag-name }}_x86_64-apple-darwin.zip
           download-sha256: ${{ needs.build-mac.outputs.sha256 }}
         env:
-          COMMITTER_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+          COMMITTER_TOKEN: ${{ secrets.COMMITER_TOKEN }}
