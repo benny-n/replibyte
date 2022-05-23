@@ -143,4 +143,5 @@ jobs:
           homebrew-tap: benny-n/homebrew-replibyte
           download-url: https://github.com/benny-n/replibyte/releases/download/${{ steps.extract.outputs.tag-name }}/replibyte_${{ steps.extract.outputs.tag-name }}_x86_64-apple-darwin.zip
           download-sha256: ${{ steps.extract.outputs.sha256sum }}
+        env:
           COMMITTER_TOKEN: ${{ secrets.COMMITER_TOKEN }}
