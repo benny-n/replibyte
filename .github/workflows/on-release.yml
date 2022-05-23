@@ -127,12 +127,17 @@ jobs:
             target/x86_64-apple-darwin/release/replibyte_*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Echo sha256sum
+        run: echo ${{ steps.prep.outputs.sha256 }}
 
 
   publish-on-homebrew:
     runs-on: ubuntu-latest
     needs: build-mac
     steps:
+      - name: Echo sha256sum
+        run: echo ${{ needs.build-mac.outputs.sha256 }} 
       - name: Extract version
         id: extract-version
         run: |
