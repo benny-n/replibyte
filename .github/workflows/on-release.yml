@@ -116,8 +116,8 @@ jobs:
           FILE=replibyte_${RELEASE_NAME}_x86_64-apple-darwin
           sudo zip -9r ${FILE}.zip replibyte && sudo rm replibyte
           sudo touch ${FILE}.zip.sha256sum && sudo chmod 777 ${FILE}.zip.sha256sum
-          CHECKSUM=$(sudo sha256sum "${FILE}" | cut -d ' ' -f 1)
-          echo "${CHECKSUM}" > ${FILE}.sha256sum
+          CHECKSUM=$(sudo sha256sum "${FILE}.zip" | cut -d ' ' -f 1)
+          echo "${CHECKSUM}" > ${FILE}.zip.sha256sum
           echo "::set-output name=sha256::${CHECKSUM}"
 
       - name: Release
