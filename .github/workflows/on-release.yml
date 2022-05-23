@@ -85,7 +85,8 @@ jobs:
 
   build-mac:
     runs-on: ubuntu-latest
-
+    outputs:
+      sha256: ${{ steps.prep.outputs.sha256 }}
     steps:
 #       - name: Checkout
 #         uses: actions/checkout@v1
@@ -106,12 +107,13 @@ jobs:
 #             joseluisq/rust-linux-darwin-builder:1.60.0 \
 #             sh -c "CC=o64-clang CXX=o64-clang++ cargo build --release --target x86_64-apple-darwin"
 
-      - name: Prepare release
-        id: prep
+      - id: prep
+        name: Prepare release
         run: |
           EVENT_DATA=$(cat "$GITHUB_EVENT_PATH")
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
           FILE=replibyte_${RELEASE_NAME}_x86_64-apple-darwin.zip
+          sudo touch ${FILE} && sudo chmod 777 ${FILE}
           sudo touch ${FILE}.zip.sha256sum && sudo chmod 777 ${FILE}.zip.sha256sum
           CHECKSUM=$(sudo sha256sum "${FILE}" | cut -d ' ' -f 1)
           echo "${CHECKSUM}" > ${FILE}.sha256sum
@@ -124,9 +126,10 @@ jobs:
             target/x86_64-apple-darwin/release/replibyte_*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Check
+        run: echo ${{ steps.prep.outputs.sha256 }}
 
-    outputs:
-      sha256: ${{ steps.prep.outputs.sha256 }}
 
   publish-on-homebrew:
     runs-on: ubuntu-latest
