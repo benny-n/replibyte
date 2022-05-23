@@ -113,8 +113,8 @@ jobs:
           RELEASE_NAME=$(echo "$EVENT_DATA" | jq -r .release.tag_name)
           FILE=replibyte_${RELEASE_NAME}_x86_64-apple-darwin.zip
           sudo touch ${FILE}.zip.sha256sum && sudo chmod 777 ${FILE}.zip.sha256sum
-          CHECKSUM=$(sudo sha256sum "${FILE}.zip" | cut -d ' ' -f 1)
-          echo "${CHECKSUM}" > ${FILE}.zip.sha256sum
+          CHECKSUM=$(sudo sha256sum "${FILE}" | cut -d ' ' -f 1)
+          echo "${CHECKSUM}" > ${FILE}.sha256sum
           echo "::set-output name=sha256::${CHECKSUM}"
 
       - name: Release
