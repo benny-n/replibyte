@@ -135,19 +135,18 @@ jobs:
   publish-on-homebrew:
     runs-on: ubuntu-latest
     needs: build-mac
-    steps:
-      - name: Echo sha256sum
-        run: echo ${{ needs.build-mac.outputs.sha256 }} 
-      - name: Extract version
-        id: extract-version
+    steps: 
+      - name: Extract version and sha256sum
+        id: extract
         run: |
           printf "::set-output name=%s::%s\n" tag-name "${GITHUB_REF#refs/tags/}"
+          printf "::set-output name=%s::%s\n" sha256 "${{ needs.build-mac.outputs.sha256 }}"
       - uses: mislav/bump-homebrew-formula-action@v2
         if: "!contains(github.ref, '-')" # skip prereleases
         with:
           formula-name: replibyte
           homebrew-tap: benny-n/homebrew-replibyte
-          download-url: https://github.com/benny-n/replibyte/releases/download/${{ steps.extract-version.outputs.tag-name }}/replibyte_${{ steps.extract-version.outputs.tag-name }}_x86_64-apple-darwin.zip
-          download-sha256: ${{ needs.build-mac.outputs.sha256 }}
+          download-url: https://github.com/benny-n/replibyte/releases/download/${{ steps.extract.outputs.tag-name }}/replibyte_${{ steps.extract.outputs.tag-name }}_x86_64-apple-darwin.zip
+          download-sha256: ${{ steps.extract.outputs.sha256 }}
         env:
           COMMITTER_TOKEN: ${{ secrets.COMMITER_TOKEN }}
